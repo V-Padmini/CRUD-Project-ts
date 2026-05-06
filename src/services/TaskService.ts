@@ -1,5 +1,5 @@
 import type { ITask } from "../interfaces/ITask";
-
+import { v4 as uuidv4 } from "uuid";
 const TASKS_KEY = "tasks";
 
 export class TaskService {
@@ -13,14 +13,14 @@ export class TaskService {
   }
 
   static addTask(task: ITask): ITask {
-    task.id = Date.now();
+    task.id = uuidv4(); ;
     const tasks = this.getTasks();
     tasks.push(task);
     this.saveTasks(tasks);
     return task;
   }
 
-  static updateTask(id: number, updated: Partial<ITask>): ITask | null {
+  static updateTask(id: number|string, updated: Partial<ITask>): ITask | null {
     const tasks = this.getTasks();
     const idx = tasks.findIndex(t => t.id === id);
     if (idx === -1) return null;
@@ -29,7 +29,7 @@ export class TaskService {
     return tasks[idx];
   }
 
-  static deleteTask(id: number): boolean {
+  static deleteTask(id: number|string): boolean {
     const tasks = this.getTasks();
     const newTasks = tasks.filter(t => t.id !== id);
     this.saveTasks(newTasks);

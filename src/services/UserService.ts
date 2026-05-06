@@ -1,5 +1,5 @@
 import type { IUser } from "../interfaces/IUser";
-
+import { v4 as uuidv4 } from "uuid";
 const USERS_KEY = "users";
 
 export class UserService {
@@ -15,7 +15,7 @@ export class UserService {
   static register(user: IUser): IUser | null {
     const users = this.getUsers();
     if (users.find(u => u.email === user.email)) return null;
-    user.id = Date.now();
+    user.id = uuidv4();
     users.push(user);
     this.saveUsers(users);
     return user;
