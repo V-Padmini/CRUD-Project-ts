@@ -1,20 +1,33 @@
+// src/controllers/TaskController.ts
+import type { ITask } from "../interfaces/ITask";
 import { TaskService } from "../services/TaskService";
-import type{ ITask } from "../interfaces/ITask";
+import { get, post, put, del, requestBody, param } from "../apiDecorators";
 
 export class TaskController {
-  static getTasks(userId: number): ITask[] {
-    return TaskService.getTasks(userId);
+  @get("/tasks")
+  static async getTasks(): Promise<ITask[]> {
+    await new Promise(res => setTimeout(res, 200));
+    return TaskService.getTasks();
   }
 
-  static addTask(title: string, description: string, userId: number): ITask {
-    return TaskService.addTask({ title, description, userId });
+  @post("/tasks")
+  static async addTask(@requestBody task: ITask): Promise<ITask> {
+    await new Promise(res => setTimeout(res, 200));
+    return TaskService.addTask(task);
   }
 
-  static updateTask(id: number, title: string, description: string): ITask | null {
-    return TaskService.updateTask(id, { title, description });
+  @put("/tasks/{id}")
+  static async updateTask(
+    @param("path", "id") id: number,
+    @requestBody task: Partial<ITask>
+  ): Promise<ITask | null> {
+    await new Promise(res => setTimeout(res, 200));
+    return TaskService.updateTask(id, task);
   }
 
-  static deleteTask(id: number): boolean {
+  @del("/tasks/{id}")
+  static async deleteTask(@param("path", "id") id: number): Promise<boolean> {
+    await new Promise(res => setTimeout(res, 200));
     return TaskService.deleteTask(id);
   }
 }

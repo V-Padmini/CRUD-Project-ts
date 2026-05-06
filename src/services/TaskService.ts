@@ -1,34 +1,38 @@
 import type { ITask } from "../interfaces/ITask";
 
-let tasks: ITask[] = JSON.parse(localStorage.getItem("tasks") || "[]");
-
-const saveTasks = () => localStorage.setItem("tasks", JSON.stringify(tasks));
+const TASKS_KEY = "tasks";
 
 export class TaskService {
-  static getTasks(userId: number): ITask[] {
-    return tasks.filter(t => t.userId === userId);
+  static getTasks(): ITask[] {
+    const data = localStorage.getItem(TASKS_KEY);
+    return data ? JSON.parse(data) : [];
+  }
+
+  static saveTasks(tasks: ITask[]) {
+    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
   }
 
   static addTask(task: ITask): ITask {
-    task.id = tasks.length + 1;
+    task.id = Date.now();
+    const tasks = this.getTasks();
     tasks.push(task);
-    saveTasks();
+    this.saveTasks(tasks);
     return task;
   }
 
-  static updateTask(id: number, updatedTask: Partial<ITask>): ITask | null {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return null;
-    Object.assign(task, updatedTask);
-    saveTasks();
-    return task;
+  static updateTask(id: number, updated: Partial<ITask>): ITask | null {
+    const tasks = this.getTasks();
+    const idx = tasks.findIndex(t => t.id === id);
+    if (idx === -1) return null;
+    tasks[idx] = { ...tasks[idx], ...updated };
+    this.saveTasks(tasks);
+    return tasks[idx];
   }
 
   static deleteTask(id: number): boolean {
-    const index = tasks.findIndex(t => t.id === id);
-    if (index === -1) return false;
-    tasks.splice(index, 1);
-    saveTasks();
-    return true;
+    const tasks = this.getTasks();
+    const newTasks = tasks.filter(t => t.id !== id);
+    this.saveTasks(newTasks);
+    return tasks.length !== newTasks.length;
   }
 }
